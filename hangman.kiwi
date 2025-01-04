@@ -1,0 +1,101 @@
+
+movie_title = "",
+movie_with_blanks = "",
+guesses_remaining = 5,
+bad_guess_limit = 5,
+guessed_chars = []
+
+fn pick_a_movie()
+    movies_content = fs::read("movie_titles.dat")
+    guesses_remaining = bad_guess_limit
+    movie_lines = movies_content.lines()
+    random_line_num = math::random(0, movie_lines.size()-1)
+    movie_title = movie_lines[random_line_num]
+    movie_with_blanks = ""
+    for mchar in movie_title.chars() do
+        if mchar == " "
+            movie_with_blanks += " "
+        else
+            movie_with_blanks += "_"
+        end
+    end
+    
+    println("Found Movie ${movie_title} -> ${movie_with_blanks}")
+end
+
+fn guess_letter(letter)
+    changing = movie_with_blanks.chars()
+    changes = 0
+    if guessed_chars.index(letter) >= 0 
+        println("You have already guessed that letter!")
+        return false
+    else 
+        guessed_chars.push(letter)
+    end
+    for m_letter, m_index in movie_title.lowercase().chars() do
+        if m_letter == letter
+            println("Changing Char ${m_letter} at ${m_index}")
+            changing[m_index] = movie_title.chars()[m_index] 
+            changes += 1
+        end
+    end
+    if changes > 0
+        movie_with_blanks = changing.join() # good guess
+        println("That is a correct guess!\n")
+    else
+        guesses_remaining -= 1 # bad guess
+        println("That is not correct.\n")
+    end
+    return changes > 0
+end
+
+fn game_finished()
+    if movie_with_blanks.chars().index('_') > -1
+        if guesses_remaining <= 0
+            println("--------------------------------------")
+            println("Game Over - Try Again!")
+            println("--------------------------------------")
+            return true
+        end
+        return false
+    end
+    println("--------------------------------------")
+    println("Game Over - You have Won!")
+    println("--------------------------------------")
+    return true
+end
+
+fn run_game()
+    println("Hangman Game Start")
+    pick_a_movie()
+    println("Found Movie ${movie_title} -> ${movie_with_blanks}")
+    while true do
+        println("--------------------------------------")
+        println(movie_with_blanks)
+        println("--------------------------------------")
+        println("Bad Guesses Remaining: ${guesses_remaining}")
+        println("Characters Guessed: ${guessed_chars}")
+        println("--------------------------------------")
+        guess = input("Enter A Letter to Guess: ")
+        if guess.chars().size() == 0
+            println("..\n")
+            next
+        elseif guess.chars().size() > 1
+            println("Too many characters being guessed!\n")
+            next
+        else
+            letter_in = guess.lowercase().chars()[0]
+            guess_letter(letter_in)
+        end
+        if game_finished()
+            again_response = input("Would you like to play again? [Y/N]: ")
+            if again_response.lowercase() != "y"
+                println("Thanks for playing!\n")
+                exit
+            end
+            pick_a_movie()
+        end
+    end
+end
+
+run_game()

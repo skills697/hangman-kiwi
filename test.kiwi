@@ -1,0 +1,26 @@
+someString1 = "hello world!"
+println("String1: ${someString1}")
+
+fn updateSomeString1()
+    strchars = someString1.chars()
+    strchars[4] = "n"
+    someString1 = strchars.join()
+end
+
+updateSomeString1()
+
+println("String1: ${someString1}")
+
+var (someString2 = "hello world!")
+
+println("String2: ${someString2}")
+
+fn updateSomeString2()
+    strchars = someString2.chars()
+    strchars[4] = "n"
+    someString2 = strchars.join()
+end
+
+updateSomeString2()
+
+println("String2: ${someString2}")
